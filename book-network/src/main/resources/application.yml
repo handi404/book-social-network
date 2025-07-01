@@ -1,0 +1,16 @@
+spring:
+  profiles:
+    active: dev # Spring 将从这里的名称中检测到 application-dev
+  servlet:
+    multipart:
+      max-file-size: 50MB # 指定文件上传最大
+springdoc:
+  # 指定在生成的 API 文档（OpenAPI 规范）中，默认所有接口的 响应（Produces） 媒体类型都标注为 application/json
+  # 如果某些接口有特殊返回类型（比如 XML、纯文本），需要在对应的 Controller 方法或全局配置里额外覆盖，否则文档里都会默认写成 JSON。
+  default-consumes-media-type: application/json
+server:
+  servlet:
+    # 配置内嵌 Servlet 容器（Tomcat/Jetty/Undertow）的 上下文路径（Context Path）
+    # 意味着应用部署后，所有请求都需要以 /api/v1 开头才能访问到 Controller
+    # 比如，Controller 上映射了 @GetMapping("/users")，实际访问地址就是 http://<host>:<port>/api/v1/users
+    context-path: /api/v1/

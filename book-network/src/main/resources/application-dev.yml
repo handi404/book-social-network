@@ -1,0 +1,33 @@
+spring:
+  datasource: # 数据源
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/book_social_network
+    username: username
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update # 开发环境 保持更新
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    # 指定数据库有助于 JPA 和 Hibernate 更好地准备或生成
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect # sql 方言
+  # 对邮件（JavaMail）功能的属性设置, 用于通过 SMTP 服务器发送邮件
+  mail:
+    host: localhost # SMTP 服务器地址
+    port: 1025
+    username: ali # 登录 SMTP 服务器的用户名
+    password: ali # 登录 SMTP 服务器的密码
+    properties: # mail.properties 子项
+      # 把 JavaMail 的原生 mail.* 属性传递给底层的 javax.mail.Session
+      mail:
+        smtp:
+          trust: "*"
+        auth: true
+        starttls:
+          enabled: true
+        connectiontimeout: 5000
+        timeout: 3000
+        writetimeout: 5000
