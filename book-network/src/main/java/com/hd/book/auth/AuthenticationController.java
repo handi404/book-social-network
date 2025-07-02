@@ -31,4 +31,15 @@ public class AuthenticationController {
         service.register(request);
         return ResponseEntity.accepted().build();
     }
+
+    /*
+    * 身份验证
+    * */
+    @PostMapping("authenticate")
+    public ResponseEntity<AuthenticationResponse> authenticate(
+            @RequestBody @Valid AuthenticationRequest request
+    ) {
+        return ResponseEntity.ok(service.authenticate(request));
+    }
+
 }
