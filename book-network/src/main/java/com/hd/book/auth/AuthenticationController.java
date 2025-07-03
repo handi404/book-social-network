@@ -42,4 +42,12 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.authenticate(request));
     }
 
+    /*
+    * 使用激活码 激活账户
+    * */
+    @GetMapping("activate-account")
+    public void activate(@RequestParam String token) throws MessagingException {
+        service.activateAccount(token);
+    }
+
 }

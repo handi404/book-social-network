@@ -14,8 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -52,7 +54,7 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword())) // 安全：在将密码保存到数据库之前对其进行编码
                 .accountLocked(false)
-                .enabled(false)
+                .enabled(false) // 禁用，需要激活码激活
                 .roles(List.of(userRole))
                 .build();
         userRepository.save(user);
@@ -87,6 +89,32 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
+    }
+
+    /*
+    * 激活账户
+    * */
+//    @Transactional // 有多个写操作
+    public void activateAccount(String token) throws MessagingException {
+        Token savedToken = tokenRepository.findByToken(token)
+                // todo exception has to be defined
+                .orElseThrow(() -> new RuntimeException("Token not init"));
+
+        // 若激活码过期，再次发送电子邮件
+        if (LocalDateTime.now().isAfter(savedToken.getExpiresAt())) {
+            sendValidationEmail(savedToken.getUser());
+            throw new RuntimeException("激活令牌已过期。新的令牌已发送至同一电子邮件地址");
+        }
+
+        // 检查用户是否正确，若正确进行激活，否则抛出异常
+        var user = userRepository.findByEmail(savedToken.getUser().getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        // 更新token最后一次验证时间
+        savedToken.setValidatedAt(LocalDateTime.now());
+        tokenRepository.save(savedToken);
     }
 
     /*

@@ -24,11 +24,11 @@ public class RegistrationRequest {
     * @Email`: 被注释的元素必须是格式正确的电子邮件地址。
     * */
     // message: 未通过验证需发送的消息
-    @NotEmpty(message = "姓名是必填项")
-    @NotBlank(message = "姓名是必填项")
+    @NotEmpty(message = "名字是必填项")
+    @NotBlank(message = "名字是必填项")
     private String firstname;
-    @NotEmpty(message = "姓名是必填项")
-    @NotBlank(message = "姓名是必填项")
+    @NotEmpty(message = "姓氏是必填项")
+    @NotBlank(message = "姓氏是必填项")
     private String lastname;
     @Email(message = "电子邮件格式不正确")
     @NotEmpty(message = "邮箱是必填项")
