@@ -3,6 +3,7 @@ package com.hd.book.auth;
 import com.hd.book.email.EmailService;
 import com.hd.book.email.EmailTemplateName;
 import com.hd.book.role.RoleRepository;
+import com.hd.book.security.JwtService;
 import com.hd.book.user.Token;
 import com.hd.book.user.TokenRepository;
 import com.hd.book.user.User;
@@ -11,11 +12,14 @@ import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -27,6 +31,8 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final EmailService emailService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     @Value("${application.mailing.frontend.activation-url}")
     private String activationUrl;
@@ -53,6 +59,34 @@ public class AuthenticationService {
 
         // 发送验证电子邮件
         sendValidationEmail(user);
+    }
+
+    /*
+    * 身份验证
+    * */
+    public AuthenticationResponse authenticate(@Valid AuthenticationRequest request) {
+
+        // 在 JwtAuthFilter 中，用户通过身份验证，利用 UsernamePasswordAuthenticationToken 对象更新 SecurityContextHolder
+        /*
+        * 验证，用户名密码正确则返回 Authentication 类型对象
+        * 用户名或密码错误，抛出异常
+        * */
+        var auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+
+        // 使用声明和用户信息生成 JWT
+        var claims = new HashMap<String, Object>();
+        var user = (User) auth.getPrincipal(); // User 实现了 Principal 接口
+        claims.put("fullName", user.fullName());
+        var jwtToken = jwtService.generateToken(claims, user);
+
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .build();
     }
 
     /*
@@ -105,4 +139,5 @@ public class AuthenticationService {
 
         return codeBuilder.toString();
     }
+
 }
