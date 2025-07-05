@@ -1,27 +1,18 @@
 package com.hd.book.book;
 
+import com.hd.book.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@EntityListeners(AuditingEntityListener.class)
-public class Book {
+public class Book extends BaseEntity {
 
-    @Id
-    @GeneratedValue
-    private Integer id;
     private String title;
     private String authorName;
     private String isbn; // 编号
@@ -30,19 +21,4 @@ public class Book {
     private boolean archived; // 是否存档
     private boolean shareable; // 是否共享
 
-    /*
-    * Auditing(审计)
-    * */
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdDate; // 创建时间
-    @LastModifiedDate
-    @Column(insertable = false)
-    private LocalDateTime lastModifiedDate; // 最后修改时间
-    @CreatedBy
-    @Column(nullable = false, updatable = false)
-    private Integer createdBy; // 创建者
-    @LastModifiedBy
-    @Column(insertable = false)
-    private Integer lastModifiedBy; // 最后修改者
 }
