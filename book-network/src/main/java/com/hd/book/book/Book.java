@@ -1,9 +1,14 @@
 package com.hd.book.book;
 
 import com.hd.book.common.BaseEntity;
+import com.hd.book.feedback.Feedback;
+import com.hd.book.history.BookTransactionHistory;
+import com.hd.book.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,4 +26,11 @@ public class Book extends BaseEntity {
     private boolean archived; // 是否存档
     private boolean shareable; // 是否共享
 
+    @ManyToOne
+    @JoinColumn(name = "owner_id") // 指定外键列的名称
+    private User owner;
+    @OneToMany(mappedBy = "book")
+    private List<Feedback> feedbacks;
+    @OneToMany(mappedBy = "book")
+    private List<BookTransactionHistory> histories;
 }
