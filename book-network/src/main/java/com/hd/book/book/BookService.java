@@ -1,6 +1,7 @@
 package com.hd.book.book;
 
 import com.hd.book.user.User;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -21,5 +22,11 @@ public class BookService {
         // 设置所有者
         book.setOwner(user);
         return bookRepository.save(book).getId();
+    }
+
+    public BookResponse findById(Integer bookId) {
+        return bookRepository.findById(bookId)
+                .map(bookMapper::toBookResponse)
+                .orElseThrow(() -> new EntityNotFoundException("未找到与 ID::" + bookId + " 匹配的书籍"));
     }
 }
