@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.hd.book.book.BookSpecification.*;
+
 @Service
 @RequiredArgsConstructor
 public class BookService {
@@ -57,5 +59,21 @@ public class BookService {
                 .build();
     }
 
-
+    public PageResponse<BookResponse> findAllBooksByOwner(int page, int size, Authentication connectedUser) {
+        User user = ((User) connectedUser.getPrincipal());
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdDate").descending());
+        Page<Book> books = bookRepository.findAll(withOwnerId(user.getId()), pageRequest);
+        List<BookResponse> bookResponses = books.stream()
+                .map(bookMapper::toBookResponse)
+                .toList();
+        return PageResponse.<BookResponse>builder()
+                .content(bookResponses)
+                .number(books.getNumber())
+                .size(books.getSize())
+                .totalElements(books.getTotalElements())
+                .totalPages(books.getTotalPages())
+                .first(books.isFirst())
+                .last(books.isLast())
+                .build();
+    }
 }
