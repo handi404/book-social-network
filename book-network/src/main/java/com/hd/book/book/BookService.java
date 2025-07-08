@@ -1,12 +1,15 @@
 package com.hd.book.book;
 
 import com.hd.book.common.PageResponse;
+import com.hd.book.history.BookTransactionHistory;
+import com.hd.book.history.BookTransactionHistoryRepository;
 import com.hd.book.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ import static com.hd.book.book.BookSpecification.*;
 public class BookService {
 
     private final BookRepository bookRepository;
+    private final BookTransactionHistoryRepository transactionHistoryRepository;
     private final BookMapper bookMapper;
 
     public Integer save(@Valid BookRequest request, Authentication connectedUser) {
@@ -74,6 +78,24 @@ public class BookService {
                 .totalPages(books.getTotalPages())
                 .first(books.isFirst())
                 .last(books.isLast())
+                .build();
+    }
+
+    public PageResponse<BorrowedBookResponse> findAllBorrowedBooks(int page, int size, Authentication connectedUser) {
+        User user = ((User) connectedUser.getPrincipal());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
+        Page<BookTransactionHistory> allBorrowedBooks = transactionHistoryRepository.findAllBorrowedBooks(pageable, user.getId());
+        List<BorrowedBookResponse> bookResponses = allBorrowedBooks.stream()
+                .map(bookMapper::toBorrowedBookResponse)
+                .toList();
+        return PageResponse.<BorrowedBookResponse>builder()
+                .content(bookResponses)
+                .number(allBorrowedBooks.getNumber())
+                .size(allBorrowedBooks.getSize())
+                .totalElements(allBorrowedBooks.getTotalElements())
+                .totalPages(allBorrowedBooks.getTotalPages())
+                .first(allBorrowedBooks.isFirst())
+                .last(allBorrowedBooks.isLast())
                 .build();
     }
 }

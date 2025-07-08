@@ -1,5 +1,6 @@
 package com.hd.book.book;
 
+import com.hd.book.history.BookTransactionHistory;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,18 @@ public class BookMapper {
                 .owner(book.getOwner().fullName())
                 // todo implement later
                 // .cover() // 留空，我们稍后实施时再做
+                .build();
+    }
+
+    public BorrowedBookResponse toBorrowedBookResponse(BookTransactionHistory history) {
+        return BorrowedBookResponse.builder()
+                .id(history.getBook().getId())
+                .title(history.getBook().getTitle())
+                .authorName(history.getBook().getAuthorName())
+                .isbn(history.getBook().getIsbn())
+                .rate(history.getBook().getRate())
+                .returned(history.isReturned())
+                .returnApproved(history.isReturnApproved())
                 .build();
     }
 }
