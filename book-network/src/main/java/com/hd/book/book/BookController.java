@@ -1,5 +1,6 @@
 package com.hd.book.book;
 
+import com.hd.book.common.PageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,4 +34,18 @@ public class BookController {
     ) {
         return ResponseEntity.ok(service.findById(bookId));
     }
+
+    /*
+    * 查找网络中所有可共享的书籍(除连接用户外)
+    * */
+    @GetMapping
+    public ResponseEntity<PageResponse<BookResponse>> findAllBooks(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page, // 当前页
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size, // 页大小
+            Authentication connectedUser
+    ) {
+        return ResponseEntity.ok(service.findAllBooks(page, size, connectedUser));
+    }
+
+
 }
