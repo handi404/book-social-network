@@ -70,4 +70,17 @@ public class BookController {
     ) {
         return ResponseEntity.ok(service.findAllBorrowedBooks(page, size, connectedUser));
     }
+
+    /*
+    * 查找所有归还的书籍
+    * 书的主人也需要看到所有归还的书（包括未归还和已归还）
+    * */
+    @GetMapping("/returned")
+    public ResponseEntity<PageResponse<BorrowedBookResponse>> findAllReturnedBooks(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size,
+            Authentication connectedUser
+    ) {
+        return ResponseEntity.ok(service.findAllReturnedBooks(page, size, connectedUser));
+    }
 }

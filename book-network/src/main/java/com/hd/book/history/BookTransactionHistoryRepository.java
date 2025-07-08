@@ -8,9 +8,16 @@ import org.springframework.data.jpa.repository.Query;
 public interface BookTransactionHistoryRepository extends JpaRepository<BookTransactionHistory, Integer> {
 
     @Query("""
-    select history
-    from BookTransactionHistory history
-    where history.user.id = :userId
-    """)
+        select history
+        from BookTransactionHistory history
+        where history.user.id = :userId
+        """)
     Page<BookTransactionHistory> findAllBorrowedBooks(Pageable pageable, Integer userId);
+
+    @Query("""
+        SELECT history
+        FROM BookTransactionHistory history
+        WHERE history.book.owner.id = :userId
+        """)
+    Page<BookTransactionHistory> findAllReturnedBooks(Pageable pageable, Integer userId);
 }
