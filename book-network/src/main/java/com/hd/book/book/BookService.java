@@ -1,6 +1,7 @@
 package com.hd.book.book;
 
 import com.hd.book.common.PageResponse;
+import com.hd.book.exception.OperationNotPermittedException;
 import com.hd.book.history.BookTransactionHistory;
 import com.hd.book.history.BookTransactionHistoryRepository;
 import com.hd.book.user.User;
@@ -15,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.hd.book.book.BookSpecification.*;
 
@@ -115,5 +117,21 @@ public class BookService {
                 .first(allReturnedBooks.isFirst())
                 .last(allReturnedBooks.isLast())
                 .build();
+    }
+
+    public Integer updateShareableStatus(Integer bookId, Authentication connectedUser) {
+        User user = ((User) connectedUser.getPrincipal());
+        // 查找对应book
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("Book not found"));
+        // 安全检查(此书是否属于此连接用户)
+        if (!Objects.equals(book.getCreatedBy(), user.getId())) {
+            throw new OperationNotPermittedException("您无法更改他人书籍的共享状态");
+        }
+        // 更新
+        book.setShareable(!book.isShareable());
+        // 保存
+        bookRepository.save(book);
+        return bookId;
     }
 }
