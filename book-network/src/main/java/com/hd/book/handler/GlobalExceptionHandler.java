@@ -1,7 +1,7 @@
 package com.hd.book.handler;
 
+import com.hd.book.exception.OperationNotPermittedException;
 import jakarta.mail.MessagingException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -98,6 +98,18 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    // 处理自定义的操作未被授权异常
+    @ExceptionHandler(OperationNotPermittedException.class)
+    public ResponseEntity<ExceptionResponse> handleException(OperationNotPermittedException exp) {
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(
+                        ExceptionResponse.builder()
+                                .error(exp.getMessage())
+                                .build()
+                );
+    }
+
     // 全局异常
     // 例外情况，例如如果得到一个应用程序中没有处理的异常或任何类型的异常，
     @ExceptionHandler(Exception.class)
@@ -114,5 +126,7 @@ public class GlobalExceptionHandler {
                                 .build()
                 );
     }
+
+
 
 }
