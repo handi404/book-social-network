@@ -123,13 +123,29 @@ public class BookService {
         User user = ((User) connectedUser.getPrincipal());
         // 查找对应book
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new EntityNotFoundException("Book not found"));
+                .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
         // 安全检查(此书是否属于此连接用户)
-        if (!Objects.equals(book.getCreatedBy(), user.getId())) {
+        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
             throw new OperationNotPermittedException("您无法更改他人书籍的共享状态");
         }
         // 更新
         book.setShareable(!book.isShareable());
+        // 保存
+        bookRepository.save(book);
+        return bookId;
+    }
+
+    public Integer updateArchivedStatus(Integer bookId, Authentication connectedUser) {
+        User user = ((User) connectedUser.getPrincipal());
+        // 查找对应book
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
+        // 安全检查(此书是否属于此连接用户)
+        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("您无法更改他人书籍的存档状态");
+        }
+        // 更新
+        book.setArchived(!book.isArchived());
         // 保存
         bookRepository.save(book);
         return bookId;
