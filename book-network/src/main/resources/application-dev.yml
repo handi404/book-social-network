@@ -45,3 +45,6 @@ application:
   mailing:
     frontend:
       activation-url: http://localhost:4200/activate # 前端
+  file:
+    upload:
+      photos-output-path: ./uploads # 文件上传到服务器路径
