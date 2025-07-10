@@ -2,6 +2,7 @@ package com.hd.book.book;
 
 import com.hd.book.common.PageResponse;
 import com.hd.book.exception.OperationNotPermittedException;
+import com.hd.book.file.FileStorageService;
 import com.hd.book.history.BookTransactionHistory;
 import com.hd.book.history.BookTransactionHistoryRepository;
 import com.hd.book.user.User;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +29,7 @@ public class BookService {
     private final BookRepository bookRepository;
     private final BookTransactionHistoryRepository transactionHistoryRepository;
     private final BookMapper bookMapper;
+    private final FileStorageService fileStorageService;
 
     public Integer save(@Valid BookRequest request, Authentication connectedUser) {
         // 获取用户
@@ -227,5 +230,16 @@ public class BookService {
         // 进行批准
         bookTransactionHistory.setReturnApproved(true);
         return transactionHistoryRepository.save(bookTransactionHistory).getId();
+    }
+
+    public void uploadBookCoverPicture(Integer bookId, MultipartFile file, Authentication connectedUser) {
+        User user = ((User) connectedUser.getPrincipal());
+        // 找到对应book
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
+        // 保存到特定用户的文件夹中，并返回文件路径
+        var profilePicture = fileStorageService.saveFile(file, user.getId());
+        book.setBookCover(profilePicture);
+        bookRepository.save(book);
     }
 }
