@@ -150,4 +150,38 @@ public class BookService {
         bookRepository.save(book);
         return bookId;
     }
+
+    public Integer borrowBook(Integer bookId, Authentication connectedUser) {
+        User user = ((User) connectedUser.getPrincipal());
+        // 得到对应book
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
+        // 检查此书是否未存档且可共享
+        if (book.isArchived() || !book.isShareable()) {
+            throw new OperationNotPermittedException("所请求的书籍无法借阅，因为它已被归档或不可共享");
+        }
+        // 检查此书是否是用户自己的书
+        if (Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("你不能借阅自己的书籍");
+        }
+        // 检查用户是否已经借阅此书且未归还
+        final boolean isAlreadyBorrowedByUser = transactionHistoryRepository.isAlreadyBorrowedByUser(bookId, user.getId());
+        if (isAlreadyBorrowedByUser) {
+            throw new OperationNotPermittedException("您已经借阅了这本书，但至今尚未归还，或者归还不被书主批准");
+        }
+        // 检查此书是否已被他人借阅
+        final boolean isAlreadyBorrowed = transactionHistoryRepository.isAlreadyBorrowed(bookId);
+        if (isAlreadyBorrowed) {
+            throw new OperationNotPermittedException("您请求的书籍已被借出");
+        }
+
+        // 进行借阅
+        BookTransactionHistory bookTransactionHistory = BookTransactionHistory.builder()
+                .user(user)
+                .book(book)
+                .returned(false)
+                .returnApproved(false)
+                .build();
+        return transactionHistoryRepository.save(bookTransactionHistory).getId();
+    }
 }
