@@ -22,7 +22,7 @@ public class Book extends BaseEntity {
     private String authorName;
     private String isbn; // 编号
     private String synopsis; // 简介
-    private String bookCover; // 封面
+    private String bookCover; // 封面位置
     private boolean archived; // 是否存档
     private boolean shareable; // 是否共享
 
