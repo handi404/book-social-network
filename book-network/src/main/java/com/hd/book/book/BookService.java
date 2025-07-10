@@ -184,4 +184,48 @@ public class BookService {
                 .build();
         return transactionHistoryRepository.save(bookTransactionHistory).getId();
     }
+
+    public Integer returnBorrowedBook(Integer bookId, Authentication connectedUser) {
+        User user = ((User) connectedUser.getPrincipal());
+        // 得到对应book
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
+        // 检查此书是否未存档且可共享
+        if (book.isArchived() || !book.isShareable()) {
+            throw new OperationNotPermittedException("所请求的书籍无法借阅，因为它已被归档或不可共享");
+        }
+        // 检查此书是否是用户自己的书
+        if (Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("您无法借阅或归还您自己的书籍");
+        }
+
+        // 需要确保用户已经借阅此书且未归还
+        BookTransactionHistory bookTransactionHistory = transactionHistoryRepository.findByBookIdAndUserId(bookId, user.getId())
+                .orElseThrow(() -> new OperationNotPermittedException("您并未借阅此书"));
+        // 进行归还
+        bookTransactionHistory.setReturned(true);
+        return transactionHistoryRepository.save(bookTransactionHistory).getId();
+    }
+
+    public Integer approveReturnBorrowedBook(Integer bookId, Authentication connectedUser) {
+        User user = ((User) connectedUser.getPrincipal());
+        // 得到对应book
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
+        // 检查此书是否未存档且可共享
+        if (book.isArchived() || !book.isShareable()) {
+            throw new OperationNotPermittedException("所请求的书籍无法借阅，因为它已被归档或不可共享");
+        }
+        // 检查此书是否是用户自己的书
+        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("您无法批准退回您不拥有的书籍");
+        }
+
+        // 需要确保此书已归还但未批准
+        BookTransactionHistory bookTransactionHistory = transactionHistoryRepository.findByBookIdAndOwnerId(bookId, user.getId())
+                .orElseThrow(() -> new OperationNotPermittedException("该书籍尚未归还。您无法批准其归还"));
+        // 进行批准
+        bookTransactionHistory.setReturnApproved(true);
+        return transactionHistoryRepository.save(bookTransactionHistory).getId();
+    }
 }
