@@ -2,14 +2,19 @@ package com.hd.book.feedback;
 
 import com.hd.book.book.Book;
 import com.hd.book.book.BookRepository;
+import com.hd.book.common.PageResponse;
 import com.hd.book.exception.OperationNotPermittedException;
 import com.hd.book.user.User;
 import com.hd.book.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -35,5 +40,26 @@ public class FeedbackService {
         }
         Feedback feedback = feedbackMapper.toFeedback(request);
         return feedbackRepository.save(feedback).getId();
+    }
+
+    public PageResponse<FeedbackResponse> findAllFeedbacksByBook(Integer bookId, int page, int size, Authentication connectedUser) {
+        User user = ((User) connectedUser.getPrincipal());
+        // 分页请求的信息（请求第几页，每页多少条数据，以及可选的排序信息）
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("note").descending());
+        // 分页查询返回的结果
+        Page<Feedback> feedbacks = feedbackRepository.findAllByBookId(bookId, pageRequest);
+        // 当前页数据
+        List<FeedbackResponse> feedbackResponses = feedbacks.stream()
+                .map(response -> feedbackMapper.toFeedbackResponse(response, user.getId()))
+                .toList();
+        return PageResponse.<FeedbackResponse>builder()
+                .content(feedbackResponses)
+                .number(feedbacks.getNumber())
+                .size(feedbacks.getSize())
+                .totalElements(feedbacks.getTotalElements())
+                .totalPages(feedbacks.getTotalPages())
+                .first(feedbacks.isFirst())
+                .last(feedbacks.isLast())
+                .build();
     }
 }

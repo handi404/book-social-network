@@ -1,5 +1,6 @@
 package com.hd.book.feedback;
 
+import com.hd.book.common.PageResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,5 +25,18 @@ public class FeedbackController {
             Authentication connectedUser
     ) {
         return ResponseEntity.ok(service.save(request, connectedUser));
+    }
+
+    /*
+    * 桉书查找所有反馈
+    * */
+    @GetMapping("/feedback/{book-id}")
+    public ResponseEntity<PageResponse<FeedbackResponse>> findAllFeedbacksByBook(
+            @PathVariable("book-id") Integer bookId,
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page, // 当前页
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size, // 页大小
+            Authentication connectedUser
+    ) {
+        return ResponseEntity.ok(service.findAllFeedbacksByBook(bookId, page, size, connectedUser));
     }
 }
