@@ -50,9 +50,9 @@ public class BookService {
     public PageResponse<BookResponse> findAllBooks(int page, int size, Authentication connectedUser) {
         User user = ((User) connectedUser.getPrincipal());
         // 分页请求的信息（请求第几页，每页多少条数据，以及可选的排序信息）
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdDate").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
         // 分页查询返回的结果。需查询除连接用户外的所有可共享书籍
-        Page<Book> books = bookRepository.findAllDisplayableBooks(pageRequest, user.getId());
+        Page<Book> books = bookRepository.findAllDisplayableBooks(pageable, user.getId());
         // 当前页数据
         List<BookResponse> bookResponses = books.stream()
                 .map(bookMapper::toBookResponse)
@@ -70,8 +70,8 @@ public class BookService {
 
     public PageResponse<BookResponse> findAllBooksByOwner(int page, int size, Authentication connectedUser) {
         User user = ((User) connectedUser.getPrincipal());
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdDate").descending());
-        Page<Book> books = bookRepository.findAll(withOwnerId(user.getId()), pageRequest);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
+        Page<Book> books = bookRepository.findAll(withOwnerId(user.getId()), pageable);
         List<BookResponse> bookResponses = books.stream()
                 .map(bookMapper::toBookResponse)
                 .toList();

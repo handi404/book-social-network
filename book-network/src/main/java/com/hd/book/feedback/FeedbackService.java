@@ -5,11 +5,11 @@ import com.hd.book.book.BookRepository;
 import com.hd.book.common.PageResponse;
 import com.hd.book.exception.OperationNotPermittedException;
 import com.hd.book.user.User;
-import com.hd.book.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -45,9 +45,9 @@ public class FeedbackService {
     public PageResponse<FeedbackResponse> findAllFeedbacksByBook(Integer bookId, int page, int size, Authentication connectedUser) {
         User user = ((User) connectedUser.getPrincipal());
         // 分页请求的信息（请求第几页，每页多少条数据，以及可选的排序信息）
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("note").descending());
+        Pageable pageable = PageRequest.of(page, size);
         // 分页查询返回的结果
-        Page<Feedback> feedbacks = feedbackRepository.findAllByBookId(bookId, pageRequest);
+        Page<Feedback> feedbacks = feedbackRepository.findAllByBookId(bookId, pageable);
         // 当前页数据
         List<FeedbackResponse> feedbackResponses = feedbacks.stream()
                 .map(response -> feedbackMapper.toFeedbackResponse(response, user.getId()))
