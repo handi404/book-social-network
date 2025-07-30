@@ -16,10 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-@Service
+// @Service
 public class JwtService {
 
-    @Value("${application.security.jwt.secret-key}")
+    /*@Value("${application.security.jwt.secret-key}")
     private String SECRET_KEY;
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
@@ -38,9 +38,9 @@ public class JwtService {
         return buildToken(extraClaims, userDetails, jwtExpiration);
     }
 
-    /*
+    *//*
     * 构建令牌
-    * */
+    * *//*
     public String buildToken(
             Map<String, Object> extraClaims, // 额外声明
             UserDetails userDetails,
@@ -64,19 +64,19 @@ public class JwtService {
                 .compact(); // 生成并返回令牌
     }
 
-    /*
+    *//*
     * 验证令牌是否有效（令牌是否属于用户 && 令牌是否过期）
-    * */
+    * *//*
     public boolean isTokenValid(String token, UserDetails userDetails) {
         return (extractUsername(token).equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
     // token是否过期，过期返回true
     public boolean isTokenExpired(String token) {
-        /* public boolean before(Date when)
+        *//* public boolean before(Date when)
          * true：如果当前 Date 对象表示的时间严格早于参数 when 表示的时间。
          * false：如果当前 Date 对象表示的时间等于或晚于参数 when 表示的时间。
-         * */
+         * *//*
         // 若过期时间比当前时间晚，说明还未过期，返回false
         return extractExpiration(token).before(new Date());
     }
@@ -91,21 +91,21 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    /*
+    *//*
      * Function<T, R> 是一个函数式接口。简单来说，它代表了一个“接收一个参数并产生一个结果”的函数。
      * T：代表输入参数的类型 (Type of input)。
      * R：代表返回结果的类型 (Type of result)。
-     * */
+     * *//*
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         // apply：触发实例化的Function的方法
         return claimsResolver.apply(claims);
     }
 
-    /*
+    *//*
     * 获取令牌中拥有的所有声明
     * Claims 来自 io.jsonwebtoken，添加的jjwt依赖
-    * */
+    * *//*
     public Claims extractAllClaims(String token) {
         // Jwts 来自 io.jsonwebtoken
         return Jwts
@@ -121,5 +121,5 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         // HMAC（Hash Message Authentication Code(哈希消息验证码)）
         return Keys.hmacShaKeyFor(keyBytes);
-    }
+    }*/
 }

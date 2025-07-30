@@ -25,9 +25,9 @@ import java.util.stream.Collectors;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Entity(name = "_user")
-@EntityListeners(AuditingEntityListener.class) // 启用审计实体监听器
+// @Builder
+// @Entity(name = "_user")
+// @EntityListeners(AuditingEntityListener.class) // 启用审计实体监听器
 public class User implements UserDetails, Principal {
 
     @Id

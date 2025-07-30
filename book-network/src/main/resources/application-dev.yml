@@ -31,20 +31,25 @@ spring:
         connectiontimeout: 5000
         timeout: 3000
         writetimeout: 5000
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "http://localhost:9090/realms/book-social-network"
 
 server:
   port: 8088
 
 application:
-  security:
-    jwt:
-      secret-key: 1fa1f80fd9c12472df8faa8fc41d213774937951f65ef878a72513f5871938ee
-      expiration: 86400000 # 1 day
-      refresh-token:
-        expiration: 604800000 # 7 days
-  mailing:
-    frontend:
-      activation-url: http://localhost:4200/activate # 前端
+#  security:
+#    jwt:
+#      secret-key: 1fa1f80fd9c12472df8faa8fc41d213774937951f65ef878a72513f5871938ee
+#      expiration: 86400000 # 1 day
+#      refresh-token:
+#        expiration: 604800000 # 7 days
+#  mailing:
+#    frontend:
+#      activation-url: http://localhost:4200/activate # 前端
   file:
     upload:
       photos-output-path: ./uploads # 文件上传到服务器路径

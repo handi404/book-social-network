@@ -15,8 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-@EntityListeners(AuditingEntityListener.class) // 启用审计实体监听器
+// @Entity
+// @EntityListeners(AuditingEntityListener.class) // 启用审计实体监听器
 public class Role {
 
     @Id

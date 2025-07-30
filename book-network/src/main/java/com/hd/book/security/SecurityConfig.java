@@ -34,8 +34,8 @@ public class SecurityConfig {
             "/swagger-ui.html"
     };
 
-     private final JwtAuthFilter jwtAuthFilter;
-     private final AuthenticationProvider authenticationProvider;
+//     private final JwtAuthFilter jwtAuthFilter;
+//     private final AuthenticationProvider authenticationProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -50,7 +50,7 @@ public class SecurityConfig {
                         // 其余都需经过身份验证
                         .anyRequest().authenticated()
                 )
-                // 每个请求都应该经过身份验证，这意味着我们不应该存储身份验证状态或会话状态, 所以session应该是无状态的
+                /*// 每个请求都应该经过身份验证，这意味着我们不应该存储身份验证状态或会话状态, 所以session应该是无状态的
                 .sessionManagement(session -> session
                         // session 创建规则，STATELESS(无状态)
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -59,7 +59,9 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider)
                 // 添加自定义过滤器，并指定在哪个过滤器之前
                 // 实现 JWT 身份验证过滤器时，我们检查所有内容，然后更新 SecurityContextHolder，之后将调用用户名密码身份验证过滤器
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);*/
+                .oauth2ResourceServer(auth ->
+                        auth.jwt(token -> token.jwtAuthenticationConverter(new KeycloakJwtAuthenticationConverter())));
 
         return http.build();
 

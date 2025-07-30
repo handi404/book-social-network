@@ -23,15 +23,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BeansConfig {
 
-    private final UserDetailsService userDetailsService;
+    // private final UserDetailsService userDetailsService;
 
-    @Bean
+    /*@Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-        /* authProvider.setUserDetailsService(userDetailsService); 方法已被弃用
+        *//* authProvider.setUserDetailsService(userDetailsService); 方法已被弃用
          * 最直接的替代方案是使用 `DaoAuthenticationProvider` 的构造函数
          * new DaoAuthenticationProvider(userDetailsService)
-         * */
+         * *//*
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
@@ -46,10 +46,10 @@ public class BeansConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
-    }
+    }*/
 
     @Bean
-    public AuditorAware<Integer> auditorAware() {
+    public AuditorAware<String> auditorAware() {
         return new ApplicationAuditAware();
     }
 

@@ -23,8 +23,20 @@ services:
     ports:
       - 1080:1080 # web 程序端口
       - 1025:1025 # 应用程序使用端口
-
-
+    networks:
+      - spring-demo
+  keycloak:
+    container_name: keycloak-bsn
+    image: quay.io/keycloak/keycloak:24.0.2
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - 9090:8080
+    networks:
+      - spring-demo
+    command:
+      - "start-dev"
 networks:
   spring-demo:
     driver: bridge # 使用桥接网络驱动 (默认)
