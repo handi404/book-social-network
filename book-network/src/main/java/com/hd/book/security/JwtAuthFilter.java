@@ -16,13 +16,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Service
+//@Service
 @RequiredArgsConstructor
 // 为了每次用户发送请求时，此过滤器被触发并执行, 扩展 OncePerRequestFilter
 // 正如名称所示，每次请求都会进行一次过滤。
-public class JwtAuthFilter extends OncePerRequestFilter {
+public class JwtAuthFilter {// extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    /*private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
     @Override
@@ -43,9 +43,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String jwt;
         final String userEmail;
 
-        /*
+        *//*
         * Check JWT token (检查是否有 JWT 令牌)
-        * */
+        * *//*
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             // 不要忘记调用return，无需执行剩下的部分
@@ -58,16 +58,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // 从令牌中提取主题(userEmail)
         userEmail = jwtService.extractUsername(jwt);
 
-        /*
+        *//*
         * 检查用户是否尚未通过身份验证 如果用户已通过,不需要执行所有检查和设置或更新SecurityContextHolder
         * 当 Authentication 为空时意味着用户尚未通过身份验证 用户尚未连接
-        * */
+        * *//*
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
-            /*
+            *//*
             * 检查令牌是否有效（令牌是否属于用户以及令牌是否过期）若有效更新 SecurityContextHolder
-            * */
+            * *//*
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 // SecurityContextHolder 需要这个对象来更新
                 // 创建用户时我们没有 credentials(凭据)，用null传递
@@ -86,5 +86,5 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
-    }
+    }*/
 }

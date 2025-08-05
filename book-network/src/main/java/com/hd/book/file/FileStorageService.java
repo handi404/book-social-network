@@ -26,7 +26,7 @@ public class FileStorageService {
 
     public String saveFile(
             @NonNull MultipartFile sourceFile,
-            @NonNull Integer userId
+            @NonNull String userId
     ) {
         // 上传文件保存到服务器的子路径(根据id为每个用户创建一个文件夹，用于上传属于该用户的全部文件)
         // File.separator: 要获得正确的分隔符，必须使用文件分隔符(File.separator)

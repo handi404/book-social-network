@@ -37,9 +37,9 @@ public class BaseEntity {
 
     @CreatedBy
     @Column(nullable = false, updatable = false)
-    private Integer createdBy; // 创建者
+    private String createdBy; // 创建者
 
     @LastModifiedBy
     @Column(insertable = false)
-    private Integer lastModifiedBy; // 最后修改者
+    private String lastModifiedBy; // 最后修改者
 }

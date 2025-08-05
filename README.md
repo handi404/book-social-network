@@ -13,10 +13,12 @@ Book Social Network 是一个基于 Spring Boot 的社交网络应用，专门�
 - **搜索功能**：搜索图书和用户
 
 ## 技术栈
-
-- **后端框架**：Spring Boot
+### backend
+- **后端框架**：Spring Boot 3
 - **数据库**：PostgreSQL
-- **安全框架**：Spring Security
+- **安全框架**：Spring Security 6
 - **ORM**：Spring Data JPA
-- **构建工具**：Maven
-- **Java 版本**：Java 17+
+- JSR-303 和 Spring Validation
+- OpenAPI 和 Swagger UI 文档
+- Docker
+- Keycloak

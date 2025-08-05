@@ -33,11 +33,11 @@ public class BookService {
 
     public Integer save(@Valid BookRequest request, Authentication connectedUser) {
         // 获取用户
-        User user = ((User) connectedUser.getPrincipal());
+        // User user = ((User) connectedUser.getPrincipal());
         // DTO to Entity
         Book book = bookMapper.toBook(request);
         // 设置所有者
-        book.setOwner(user);
+        // book.setOwner(user);
         return bookRepository.save(book).getId();
     }
 
@@ -48,11 +48,11 @@ public class BookService {
     }
 
     public PageResponse<BookResponse> findAllBooks(int page, int size, Authentication connectedUser) {
-        User user = ((User) connectedUser.getPrincipal());
+        // User user = ((User) connectedUser.getPrincipal());
         // 分页请求的信息（请求第几页，每页多少条数据，以及可选的排序信息）
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
         // 分页查询返回的结果。需查询除连接用户外的所有可共享书籍
-        Page<Book> books = bookRepository.findAllDisplayableBooks(pageable, user.getId());
+        Page<Book> books = bookRepository.findAllDisplayableBooks(pageable, connectedUser.getName());
         // 当前页数据
         List<BookResponse> bookResponses = books.stream()
                 .map(bookMapper::toBookResponse)
@@ -69,9 +69,9 @@ public class BookService {
     }
 
     public PageResponse<BookResponse> findAllBooksByOwner(int page, int size, Authentication connectedUser) {
-        User user = ((User) connectedUser.getPrincipal());
+        // User user = ((User) connectedUser.getPrincipal());
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
-        Page<Book> books = bookRepository.findAll(withOwnerId(user.getId()), pageable);
+        Page<Book> books = bookRepository.findAll(withOwnerId(connectedUser.getName()), pageable);
         List<BookResponse> bookResponses = books.stream()
                 .map(bookMapper::toBookResponse)
                 .toList();
@@ -87,9 +87,9 @@ public class BookService {
     }
 
     public PageResponse<BorrowedBookResponse> findAllBorrowedBooks(int page, int size, Authentication connectedUser) {
-        User user = ((User) connectedUser.getPrincipal());
+        // User user = ((User) connectedUser.getPrincipal());
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
-        Page<BookTransactionHistory> allBorrowedBooks = transactionHistoryRepository.findAllBorrowedBooks(pageable, user.getId());
+        Page<BookTransactionHistory> allBorrowedBooks = transactionHistoryRepository.findAllBorrowedBooks(pageable, connectedUser.getName());
         List<BorrowedBookResponse> bookResponses = allBorrowedBooks.stream()
                 .map(bookMapper::toBorrowedBookResponse)
                 .toList();
@@ -105,9 +105,9 @@ public class BookService {
     }
 
     public PageResponse<BorrowedBookResponse> findAllReturnedBooks(int page, int size, Authentication connectedUser) {
-        User user = ((User) connectedUser.getPrincipal());
+        // User user = ((User) connectedUser.getPrincipal());
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
-        Page<BookTransactionHistory> allReturnedBooks = transactionHistoryRepository.findAllReturnedBooks(pageable, user.getId());
+        Page<BookTransactionHistory> allReturnedBooks = transactionHistoryRepository.findAllReturnedBooks(pageable, connectedUser.getName());
         List<BorrowedBookResponse> bookResponses = allReturnedBooks.stream()
                 .map(bookMapper::toBorrowedBookResponse)
                 .toList();
@@ -123,12 +123,12 @@ public class BookService {
     }
 
     public Integer updateShareableStatus(Integer bookId, Authentication connectedUser) {
-        User user = ((User) connectedUser.getPrincipal());
+        // User user = ((User) connectedUser.getPrincipal());
         // 查找对应book
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
         // 安全检查(此书是否属于此连接用户)
-        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
+        if (!Objects.equals(book.getCreatedBy(), connectedUser.getName())) {
             throw new OperationNotPermittedException("您无法更改他人书籍的共享状态");
         }
         // 更新
@@ -139,12 +139,12 @@ public class BookService {
     }
 
     public Integer updateArchivedStatus(Integer bookId, Authentication connectedUser) {
-        User user = ((User) connectedUser.getPrincipal());
+        // User user = ((User) connectedUser.getPrincipal());
         // 查找对应book
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
         // 安全检查(此书是否属于此连接用户)
-        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
+        if (!Objects.equals(book.getCreatedBy(), connectedUser.getName())) {
             throw new OperationNotPermittedException("您无法更改他人书籍的存档状态");
         }
         // 更新
@@ -155,7 +155,7 @@ public class BookService {
     }
 
     public Integer borrowBook(Integer bookId, Authentication connectedUser) {
-        User user = ((User) connectedUser.getPrincipal());
+        // User user = ((User) connectedUser.getPrincipal());
         // 得到对应book
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
@@ -164,11 +164,11 @@ public class BookService {
             throw new OperationNotPermittedException("所请求的书籍无法借阅，因为它已被归档或不可共享");
         }
         // 检查此书是否是用户自己的书
-        if (Objects.equals(book.getOwner().getId(), user.getId())) {
+        if (Objects.equals(book.getCreatedBy(), connectedUser.getName())) {
             throw new OperationNotPermittedException("你不能借阅自己的书籍");
         }
         // 检查用户是否已经借阅此书且未归还
-        final boolean isAlreadyBorrowedByUser = transactionHistoryRepository.isAlreadyBorrowedByUser(bookId, user.getId());
+        final boolean isAlreadyBorrowedByUser = transactionHistoryRepository.isAlreadyBorrowedByUser(bookId, connectedUser.getName());
         if (isAlreadyBorrowedByUser) {
             throw new OperationNotPermittedException("您已经借阅了这本书，但至今尚未归还，或者归还不被书主批准");
         }
@@ -180,7 +180,7 @@ public class BookService {
 
         // 进行借阅
         BookTransactionHistory bookTransactionHistory = BookTransactionHistory.builder()
-                .user(user)
+                .userId(connectedUser.getName())
                 .book(book)
                 .returned(false)
                 .returnApproved(false)
@@ -189,7 +189,7 @@ public class BookService {
     }
 
     public Integer returnBorrowedBook(Integer bookId, Authentication connectedUser) {
-        User user = ((User) connectedUser.getPrincipal());
+        // User user = ((User) connectedUser.getPrincipal());
         // 得到对应book
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
@@ -198,12 +198,12 @@ public class BookService {
             throw new OperationNotPermittedException("所请求的书籍无法借阅，因为它已被归档或不可共享");
         }
         // 检查此书是否是用户自己的书
-        if (Objects.equals(book.getOwner().getId(), user.getId())) {
+        if (Objects.equals(book.getCreatedBy(), connectedUser.getName())) {
             throw new OperationNotPermittedException("您无法借阅或归还您自己的书籍");
         }
 
         // 需要确保用户已经借阅此书且未归还
-        BookTransactionHistory bookTransactionHistory = transactionHistoryRepository.findByBookIdAndUserId(bookId, user.getId())
+        BookTransactionHistory bookTransactionHistory = transactionHistoryRepository.findByBookIdAndUserId(bookId, connectedUser.getName())
                 .orElseThrow(() -> new OperationNotPermittedException("您并未借阅此书"));
         // 进行归还
         bookTransactionHistory.setReturned(true);
@@ -211,7 +211,7 @@ public class BookService {
     }
 
     public Integer approveReturnBorrowedBook(Integer bookId, Authentication connectedUser) {
-        User user = ((User) connectedUser.getPrincipal());
+        // User user = ((User) connectedUser.getPrincipal());
         // 得到对应book
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
@@ -220,12 +220,12 @@ public class BookService {
             throw new OperationNotPermittedException("所请求的书籍无法借阅，因为它已被归档或不可共享");
         }
         // 检查此书是否是用户自己的书
-        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
+        if (!Objects.equals(book.getCreatedBy(), connectedUser.getName())) {
             throw new OperationNotPermittedException("您无法批准退回您不拥有的书籍");
         }
 
         // 需要确保此书已归还但未批准
-        BookTransactionHistory bookTransactionHistory = transactionHistoryRepository.findByBookIdAndOwnerId(bookId, user.getId())
+        BookTransactionHistory bookTransactionHistory = transactionHistoryRepository.findByBookIdAndOwnerId(bookId, connectedUser.getName())
                 .orElseThrow(() -> new OperationNotPermittedException("该书籍尚未归还。您无法批准其归还"));
         // 进行批准
         bookTransactionHistory.setReturnApproved(true);
@@ -233,12 +233,12 @@ public class BookService {
     }
 
     public void uploadBookCoverPicture(Integer bookId, MultipartFile file, Authentication connectedUser) {
-        User user = ((User) connectedUser.getPrincipal());
+        // User user = ((User) connectedUser.getPrincipal());
         // 找到对应book
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
         // 保存到特定用户的文件夹中，并返回文件路径
-        var profilePicture = fileStorageService.saveFile(file, user.getId());
+        var profilePicture = fileStorageService.saveFile(file, connectedUser.getName());
         book.setBookCover(profilePicture);
         bookRepository.save(book);
     }

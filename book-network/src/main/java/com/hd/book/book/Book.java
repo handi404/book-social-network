@@ -26,9 +26,9 @@ public class Book extends BaseEntity {
     private boolean archived; // 是否存档
     private boolean shareable; // 是否共享
 
-    @ManyToOne
+    /*@ManyToOne
     @JoinColumn(name = "owner_id") // 指定外键列的名称
-    private User owner;
+    private User owner;*/
     @OneToMany(mappedBy = "book")
     private List<Feedback> feedbacks;
     @OneToMany(mappedBy = "book")

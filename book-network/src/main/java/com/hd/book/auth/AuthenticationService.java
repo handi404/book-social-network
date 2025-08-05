@@ -24,11 +24,11 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
-@Service
+// @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final RoleRepository roleRepository;
+    /*private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
@@ -39,9 +39,9 @@ public class AuthenticationService {
     @Value("${application.mailing.frontend.activation-url}")
     private String activationUrl;
 
-    /*
+    *//*
     * 注册
-    * */
+    * *//*
     public void register(@Valid RegistrationRequest request) throws MessagingException {
         // 得到名为USER的Role, 分配给用户
         var userRole = roleRepository.findByName("USER")
@@ -63,16 +63,16 @@ public class AuthenticationService {
         sendValidationEmail(user);
     }
 
-    /*
+    *//*
     * 身份验证
-    * */
+    * *//*
     public AuthenticationResponse authenticate(@Valid AuthenticationRequest request) {
 
         // 在 JwtAuthFilter 中，用户通过身份验证，利用 UsernamePasswordAuthenticationToken 对象更新 SecurityContextHolder
-        /*
+        *//*
         * 验证，用户名密码正确则返回 Authentication 类型对象
         * 用户名或密码错误，抛出异常
-        * */
+        * *//*
         var auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -91,9 +91,9 @@ public class AuthenticationService {
                 .build();
     }
 
-    /*
+    *//*
     * 激活账户
-    * */
+    * *//*
 //    @Transactional // 有多个写操作
     public void activateAccount(String token) throws MessagingException {
         Token savedToken = tokenRepository.findByToken(token)
@@ -117,9 +117,9 @@ public class AuthenticationService {
         tokenRepository.save(savedToken);
     }
 
-    /*
+    *//*
     * 发送验证电子邮件
-    * */
+    * *//*
     private void sendValidationEmail(User user) throws MessagingException {
         // 生成并保存激活token
         var newToken = generateAndSaveActivationToken(user);
@@ -148,9 +148,9 @@ public class AuthenticationService {
         return generatedToken;
     }
 
-    /*
+    *//*
     * 生成激活码
-    * */
+    * *//*
     private String generateActivationCode(int length) {
         String characters = "0123456789";
         StringBuilder codeBuilder = new StringBuilder();
@@ -166,6 +166,6 @@ public class AuthenticationService {
         }
 
         return codeBuilder.toString();
-    }
+    }*/
 
 }
