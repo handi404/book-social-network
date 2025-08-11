@@ -60,7 +60,7 @@ public class BeansConfig {
         // 是否允许发送 Cookie 和其他凭证信息
         config.setAllowCredentials(true);
         // 允许的源
-        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:8080"));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:8080"));
         // 允许的请求头
         config.setAllowedHeaders(Arrays.asList(
                 HttpHeaders.ORIGIN,
