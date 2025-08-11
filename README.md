@@ -22,3 +22,10 @@ Book Social Network 是一个基于 Spring Boot 的社交网络应用，专门�
 - OpenAPI 和 Swagger UI 文档
 - Docker
 - Keycloak
+
+### frontend
+
+- Angular、Vue
+- [@hey-api/openapi-ts](https://github.com/hey-api/openapi-ts)
+- Element Plus (Vue)
+- Authentication Guard
